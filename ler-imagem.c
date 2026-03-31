@@ -3,7 +3,6 @@
 
 int main(void) {
     int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *valorMax);
-    OLA
     
     char tipo[3];
     int *M, largura, altura, valorMax;
