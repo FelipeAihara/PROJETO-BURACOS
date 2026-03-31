@@ -2,25 +2,25 @@
 #include <stdlib.h>
 
 int main(void) {
-    int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *valorMax);
+    int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *valorMax, int *valorMin);
     
     char tipo[3];
-    int *M, largura, altura, valorMax;
+    int *M, largura, altura, valorMax, valorMin;
     char nome[] = "superficie_aleatoria.pgm";
 
-    int a = lerImagem(nome, tipo, M, &largura, &altura, &valorMax);
+    int a = lerImagem(nome, tipo, M, &largura, &altura, &valorMax, &valorMin);
     if (a == 1) printf("Erro ao ler o arquivo");
     
     printf("Largura: %d\n", largura);
     printf("Altura: %d\n", altura);
     printf("Valor maximo: %d\n", valorMax);
-    printf("M[1][1] = %d\n", M[512]);
+    printf("Valor minimo: %d\n", valorMin);
 
     return 0;
 }
 
 // Retorna 0 se dá tudo certo. Retorna outro número caso contrário.
-int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *valorMax) {
+int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *valorMax, int *valorMin) {
     
     // Abrir o arquivo
     FILE *arquivo = fopen(nome, "r");
@@ -42,9 +42,13 @@ int lerImagem(char nome[], char tipo[], int *M, int *largura, int *altura, int *
             return 1;
         }
 
-    // Ler os pixels
+    // Ler os pixels e achar o valor mínimo
+    *valorMin = 255;
     for (int i = 0; i < *altura; i++) {
-        for (int j = 0; j < *largura; j++) fscanf(arquivo, "%d", &M[i*(*largura) + j]);
+        for (int j = 0; j < *largura; j++) {
+            fscanf(arquivo, "%d", &M[i*(*largura) + j]);
+            if (M[i*(*largura) + j] < *valorMin) *valorMin = M[i*(*largura) + j];
+        }
     }
     fclose(arquivo);
     return 0;
