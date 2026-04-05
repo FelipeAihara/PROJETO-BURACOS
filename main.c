@@ -20,6 +20,9 @@ int main(void) {
 
     criaCopia(copia, M, &C, largura, altura, valorMax, valorMin);
 
+    free(M);
+    free(C);
+
     return 0;
 }
 
