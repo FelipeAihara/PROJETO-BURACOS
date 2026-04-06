@@ -207,7 +207,7 @@ void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
         copia_2[i] = copia[inicio + i];
     }
 
-    for (int i = inicio; i < count - inicio; i++) {
+    for (int i = 0; i < count - inicio; i++) {
         for (int j = i+1; j < count - inicio; j++) {
             int dx = copia_2[i].x - copia_2[j].x;
             int dy = copia_2[i].y - copia_2[j].y;
