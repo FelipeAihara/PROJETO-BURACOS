@@ -199,9 +199,9 @@ void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[]
     }
 }
 
+// Unifica centroides. Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. Por isso a sua necessidade.
 void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
     
-    // Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. Por isso a necessidade de unificá-los.
     Centroides copia_2[count - inicio];
     for (int i = 0; i < count - inicio; i++) {
         copia_2[i] = copia[inicio + i];
