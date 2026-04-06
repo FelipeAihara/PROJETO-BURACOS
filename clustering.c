@@ -202,27 +202,35 @@ void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[]
 void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
     
     // Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. Por isso a necessidade de unificá-los.
-    Centroides copia_2[count];
-    for (int i = 0; i < count; i++) {
-        copia_2[i] = copia[i];
+    Centroides copia_2[count - inicio];
+    for (int i = 0; i < count - inicio; i++) {
+        copia_2[i] = copia[inicio + i];
+        printf("%d %d\n", copia_2[i].x, copia_2[i].y);
     }
 
-    for (int i = inicio; i < count; i++) {
-        for (int j = i+1; j < count; j++) {
-            int dx = copia[i].x - copia[j].x;
-            int dy = copia[i].y - copia[j].y;
+    for (int i = inicio; i < count - inicio; i++) {
+        for (int j = i+1; j < count - inicio; j++) {
+            int dx = copia_2[i].x - copia_2[j].x;
+            int dy = copia_2[i].y - copia_2[j].y;
             int d = sqrt(dx*dx + dy*dy);
             if (d < r) {
-                inicio++;
-                copia[inicio].x = (copia_2[i].x + copia_2[j].x) / 2;
-                copia[inicio].y = (copia_2[i].y + copia_2[j].y) / 2;
+                int a, b, c, d;
+                a = (copia_2[i].x + copia_2[j].x) % 2;
+                if (a == 1) b = ((copia_2[i].x + copia_2[j].x) / 2) + 1;
+                else b = (copia_2[i].x + copia_2[j].x) / 2;
+                c = (copia_2[i].y + copia_2[j].y) % 2;
+                if (c == 1) d = ((copia_2[i].y + copia_2[j].y) / 2) + 1;
+                else d = (copia_2[i].y + copia_2[j].y) / 2;
+                copia[inicio + 1].x = b;
+                copia[inicio + 1].y = d;
                 int l = 1;
-                for (int k = 0; k < count; k++) {
+                for (int k = 0; k < count - inicio; k++) {
                     if (k != i && k != j) {
-                        copia[inicio + l] = copia_2[k];
+                        copia[inicio + 1 + l] = copia_2[k];
                         l++;
                     }
                 }
+                inicio++;
                 unificaBuracos(inicio, count, copia, r);
                 return;
             }
@@ -231,7 +239,7 @@ void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
     int n_buracos = count - inicio;
     printf("Numero de buracos: %d\n", n_buracos);
     for (int i = 0; i < n_buracos; i++) 
-        printf("Buraco %d: [%d, %d]\n", i + 1, copia_2[inicio + i].x, copia_2[inicio + i].y);
+        printf("Buraco %d: [%d, %d]\n", i + 1, copia[inicio + i].x, copia[inicio + i].y);
 }
 
 // Printa o número de buracos e as suas coordenadas
