@@ -11,7 +11,7 @@
 #include <math.h>
 
 #define K 30
-#define raio 0
+#define raio 20
 
 typedef struct {
     int x;
@@ -27,7 +27,7 @@ typedef struct {
 void lerImagem(char nome[], char tipo[], int **M, int *largura, int *altura, int *valorMax, int *valorMin);
 void criaCopia(char nome_arquivo[], int *M, int **C, int largura, int altura, int valorMax, int valorMin, int *contador);
 void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[], int len_ctr);
-void unificaBuracos(int inicio, int count, Centroides copia[], Centroides copia_2[], int r);
+void unificaBuracos(int inicio, int count, Centroides copia[], int r);
 void printaBuracos(int *C, int altura, Centroides ctr[], int len_ctr, int r);
 
 int main(void) {
@@ -199,7 +199,14 @@ void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[]
     }
 }
 
-void unificaBuracos(int inicio, int count, Centroides copia[], Centroides copia_2[], int r) {
+void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
+    
+    // Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. Por isso a necessidade de unificá-los.
+    Centroides copia_2[count];
+    for (int i = 0; i < count; i++) {
+        copia_2[i] = copia[i];
+    }
+
     for (int i = inicio; i < count; i++) {
         for (int j = i+1; j < count; j++) {
             int dx = copia[i].x - copia[j].x;
@@ -207,16 +214,16 @@ void unificaBuracos(int inicio, int count, Centroides copia[], Centroides copia_
             int d = sqrt(dx*dx + dy*dy);
             if (d < r) {
                 inicio++;
-                copia_2[inicio].x = (copia[i].x + copia[j].x) / 2;
-                copia_2[inicio].y = (copia[i].y + copia[j].y) / 2;
+                copia[inicio].x = (copia_2[i].x + copia_2[j].x) / 2;
+                copia[inicio].y = (copia_2[i].y + copia_2[j].y) / 2;
                 int l = 1;
                 for (int k = 0; k < count; k++) {
                     if (k != i && k != j) {
-                        copia_2[inicio + l] = copia[k];
+                        copia[inicio + l] = copia_2[k];
                         l++;
                     }
                 }
-                unificaBuracos(inicio, count, copia, copia_2, r);
+                unificaBuracos(inicio, count, copia, r);
                 return;
             }
         }
@@ -230,6 +237,7 @@ void unificaBuracos(int inicio, int count, Centroides copia[], Centroides copia_
 // Printa o número de buracos e as suas coordenadas
 void printaBuracos(int *C, int altura, Centroides ctr[], int len_ctr, int r) {
 
+    // Encontra todos os centroides cujo pixel é preto
     int count = 0;
     Centroides copia[len_ctr];
     for (int i = 0; i < len_ctr; i++) {
@@ -240,6 +248,5 @@ void printaBuracos(int *C, int altura, Centroides ctr[], int len_ctr, int r) {
     }
 
     int inicio = 0;
-    Centroides copia_2[count];
-    unificaBuracos(inicio, count, copia, copia_2, r);
+    unificaBuracos(inicio, count, copia, r);
 }
