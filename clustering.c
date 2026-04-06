@@ -205,7 +205,6 @@ void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
     Centroides copia_2[count - inicio];
     for (int i = 0; i < count - inicio; i++) {
         copia_2[i] = copia[inicio + i];
-        printf("%d %d\n", copia_2[i].x, copia_2[i].y);
     }
 
     for (int i = inicio; i < count - inicio; i++) {
