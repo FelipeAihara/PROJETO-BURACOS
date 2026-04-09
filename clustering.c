@@ -27,7 +27,7 @@ typedef struct {
 void lerImagem(char nome[], char tipo[], int **M, int *largura, int *altura, int *valorMax, int *valorMin);
 void criaCopia(char nome_arquivo[], int *M, int **C, int largura, int altura, int valorMax, int valorMin, int *contador);
 void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[], int len_ctr);
-void unificaBuracos(int inicio, int count, Centroides copia[], int r);
+void unificaBuracos(Centroides copia[], int len_copia, int r);
 void printaBuracos(int *C, int altura, Centroides ctr[], int len_ctr, int r);
 
 int main(void) {
@@ -199,46 +199,67 @@ void clustering(int *C, int tamanho, Pontos pnt[], int len_pnt, Centroides ctr[]
     }
 }
 
-// Unifica centroides. Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. Por isso a sua necessidade.
-void unificaBuracos(int inicio, int count, Centroides copia[], int r) {
-    
-    Centroides copia_2[count - inicio];
-    for (int i = 0; i < count - inicio; i++) {
-        copia_2[i] = copia[inicio + i];
+// Unifica centroides. Às vezes o algoritmo pode encontra dois ou mais centroides para o mesmo buraco. 
+// Por isso a necessidade desse algoritmo.
+void unificaBuracos(Centroides copia[], int len_copia, int r) {
+
+    Centroides copia_2[len_copia];
+    for (int i = 0; i < len_copia; i++) {
+        copia_2[i] = copia[i];
+    }
+    int count = 0;
+    int *Tabela = malloc(len_copia * len_copia * sizeof(int));
+    int soma_linha[len_copia];
+    int visto[len_copia];
+
+    for (int i = 0; i < len_copia; i++) {
+        soma_linha[i] = 0;
+        visto[i] = 0;
     }
 
-    for (int i = 0; i < count - inicio; i++) {
-        for (int j = i+1; j < count - inicio; j++) {
-            int dx = copia_2[i].x - copia_2[j].x;
-            int dy = copia_2[i].y - copia_2[j].y;
+    for (int i = 0; i < len_copia; i++) {
+        for (int j = 0; j < len_copia; j++) {
+            int dx = copia[i].x - copia[j].x;
+            int dy = copia[i].y - copia[j].y;
             int d = sqrt(dx*dx + dy*dy);
             if (d < r) {
-                int a, b, c, d;
-                a = (copia_2[i].x + copia_2[j].x) % 2;
-                if (a == 1) b = ((copia_2[i].x + copia_2[j].x) / 2) + 1;
-                else b = (copia_2[i].x + copia_2[j].x) / 2;
-                c = (copia_2[i].y + copia_2[j].y) % 2;
-                if (c == 1) d = ((copia_2[i].y + copia_2[j].y) / 2) + 1;
-                else d = (copia_2[i].y + copia_2[j].y) / 2;
-                copia[inicio + 1].x = b;
-                copia[inicio + 1].y = d;
-                int l = 1;
-                for (int k = 0; k < count - inicio; k++) {
-                    if (k != i && k != j) {
-                        copia[inicio + 1 + l] = copia_2[k];
-                        l++;
-                    }
-                }
-                inicio++;
-                unificaBuracos(inicio, count, copia, r);
-                return;
+                Tabela[i * len_copia + j] = 1;
+                soma_linha[i] += 1;
             }
+            else Tabela[i * len_copia + j] = 0;
         }
     }
-    int n_buracos = count - inicio;
-    printf("Numero de buracos: %d\n", n_buracos);
-    for (int i = 0; i < n_buracos; i++) 
-        printf("Buraco %d: [%d, %d]\n", i + 1, copia[inicio + i].x, copia[inicio + i].y);
+
+    for (int i = 0; i < len_copia; i++) {
+        if (visto[i] == 0) {
+            int soma_x = 0;
+            int soma_y = 0;
+            int indices[soma_linha[i]];
+            int temp = 0;
+            for (int j = 0; j < len_copia; j++) {
+                if (Tabela[i * len_copia + j] == 1) {
+                    visto[j] = 1;
+                    indices[temp] = j;
+                    temp++;
+                }
+            }
+
+            for (int k = 0; k < soma_linha[i]; k++) {
+                soma_x += copia_2[indices[k]].x;
+                soma_y += copia_2[indices[k]].y;
+            }
+
+            copia[count].x = soma_x / soma_linha[i];
+            copia[count].y = soma_y / soma_linha[i];
+            count++;
+        }
+    }
+
+    // Printa a quantidade de buracos e suas coordenadas
+    printf("Numero de buracos: %d\n", count);
+    for (int i = 0; i < count; i++) {
+        printf("Buraco %d: [%d, %d]\n", i+1, copia[i].x, copia[i].y);
+    }
 }
 
 // Printa o número de buracos e as suas coordenadas
@@ -253,7 +274,5 @@ void printaBuracos(int *C, int altura, Centroides ctr[], int len_ctr, int r) {
             count++;
         }
     }
-
-    int inicio = 0;
-    unificaBuracos(inicio, count, copia, r);
+    unificaBuracos(copia, count, r);
 }
