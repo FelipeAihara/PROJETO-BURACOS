@@ -1,10 +1,8 @@
     /* NOTAS:
     - Usar int ao invés de float pode resultar em erros. Ficar atento a essa possibilidade
-    - printf("Passou aqui\n");
-    - É ineficiente usar a sqrt na função clustering mas vou usar
     - Vamos assumir que se d(a,b) < r e d(b,c) < r -> d(a,c) < r
     - Esse algoritmo não funciona para caso haja buracos muitos pequenos muito próximos
-    - O valor máximo está errado (ARRUMEI)
+    - Eu acho que o algoritmo de unificar buracos não está bom, ele poderia ser melhorado
     */
 
     #include <stdio.h>
